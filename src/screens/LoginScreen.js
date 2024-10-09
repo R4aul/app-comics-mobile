@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import FormTextField from '../components/FormTextField'
+import React, { useEffect } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
+import FormTextField from '../components/FormTextField';
 
 export default function LoginScreen({ navigation }) {
   useEffect(() => {
@@ -9,46 +9,52 @@ export default function LoginScreen({ navigation }) {
     });
   }, []);
 
-
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Inicio de sesión</Text>
-      <View style={styles.inputContainer}>
-        <FormTextField
-          placeholder='Correo'        
-          placeholderTextColor='#aaa'
-        />
-        <FormTextField
-          placeholder='Contraseña'        
-          placeholderTextColor='#aaa'
-          secureTextEntry
-        />
+    <ImageBackground
+      source={{ uri: 'https://i.pinimg.com/originals/f6/7c/b4/f67cb4c7986817cbca9d51833d21448b.jpg' }}
+      style={styles.background}
+    >
+      <View style={styles.container}>
+        <Text style={styles.title}>Inicio de sesión</Text>
+        <View style={styles.inputContainer}>
+          <FormTextField
+            placeholder='Correo'
+            placeholderTextColor='#aaa'
+          />
+          <FormTextField
+            placeholder='Contraseña'
+            placeholderTextColor='#aaa'
+            secureTextEntry
+          />
+        </View>
+        <TouchableOpacity style={styles.button}>
+          <Text style={styles.buttonText}>Iniciar sesión</Text>
+        </TouchableOpacity>
+        <Text style={styles.noAccountText}>¿No tienes una cuenta?</Text>
+        <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('RegisterScreen')}>
+          <Text style={styles.registerButtonText}>Regístrate</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.button}>
-        <Text style={styles.buttonText}>Iniciar sesión</Text>
-      </TouchableOpacity>
-
-      {/* Texto y botón de registro, que aparecen al iniciar la pantalla */}
-      <Text style={styles.noAccountText}>¿No tienes una cuenta?</Text>
-      <TouchableOpacity style={styles.registerButton} onPress={() => navigation.navigate('RegisterScreen')}>
-        <Text style={styles.registerButtonText}>Regístrate</Text>
-      </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    resizeMode: 'cover',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#f8f9fa',
     paddingHorizontal: 20,
   },
   title: {
     fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#000000',
     marginBottom: 40,
   },
   inputContainer: {

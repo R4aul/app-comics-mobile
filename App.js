@@ -32,9 +32,9 @@ export default function App() {
   return (
     <NavigationContainer>
       <Drawer.Navigator>
+        <Drawer.Screen name="Home" component={HomeScreens}/>
         <Drawer.Screen name='LoginScreen' component={LoginScreen} />
         <Drawer.Screen name='RegisterScreen' component={RegisterScreen} />
-        <Drawer.Screen name="Home" component={HomeScreens}/>
         <Drawer.Screen name="Notifications" component={NotificationsScreen} />
         {/* Aquí colocas el TabNavigator dentro de una pantalla del Drawer */}
       </Drawer.Navigator>
