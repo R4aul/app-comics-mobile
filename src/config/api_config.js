@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getToken } from '../services/TokenServices'
 
-const API_URL = '';
+const API_URL = 'https://d7a1-2806-105e-21-c47a-98a-3a37-dc92-892.ngrok-free.app';
 
 export const api = axios.create({
     baseURL:API_URL+'/api',
@@ -13,7 +13,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(async(req)=>{
     const TOKEN = await getToken();
-    if (TOKEN != null) {
+    if (TOKEN !== null) {
        req.headers["Authorization"] = `Bearer ${TOKEN}`
     }
     return req;

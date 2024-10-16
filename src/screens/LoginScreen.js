@@ -1,17 +1,46 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import FormTextField from '../components/FormTextField';
+import AuthContext from '../contexts/AuthContext'
+import { login, loaduser } from '../services/AuthServices'
 
 export default function LoginScreen({ navigation }) {
+
+  const { setUser } =  useContext(AuthContext);
+
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, []);
 
+ const [client, setClient] = useState({
+    email:'',
+    password:''
+ });
+
+ const [errors, setErrors] = useState({});
+  
+ const handelChange = (name, value ) => setClient({...client, [name]:value});
+  
+ const handelSubmit = async () => {
+    try {
+      await login(client); 
+      const user = loaduser();
+      console.log(user);
+      
+      setUser(user);
+    } catch (error) {
+      console.log(error);
+      if (error.response?.data) {
+        console.log(error.response.data.errors);
+        setErrors(error.response.data.errors);
+      }
+    }
+ }
+
   return (
     <ImageBackground
-      source={{ uri: 'https://i.pinimg.com/originals/f6/7c/b4/f67cb4c7986817cbca9d51833d21448b.jpg' }}
       style={styles.background}
     >
       <View style={styles.container}>
@@ -20,14 +49,18 @@ export default function LoginScreen({ navigation }) {
           <FormTextField
             placeholder='Correo'
             placeholderTextColor='#aaa'
+            onChangeText={(text)=>handelChange('email',text)}
+            errors={errors.email}
           />
           <FormTextField
             placeholder='Contraseña'
             placeholderTextColor='#aaa'
+            onChangeText={(text)=>handelChange('password', text)}
             secureTextEntry
+            errors={errors.password}
           />
         </View>
-        <TouchableOpacity style={styles.button}>
+        <TouchableOpacity style={styles.button} onPress={handelSubmit}>
           <Text style={styles.buttonText}>Iniciar sesión</Text>
         </TouchableOpacity>
         <Text style={styles.noAccountText}>¿No tienes una cuenta?</Text>

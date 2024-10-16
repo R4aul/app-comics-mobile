@@ -1,16 +1,41 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useContext } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { register, loaduser } from '../services/AuthServices'
 import FormTextField from '../components/FormTextField'
+import AuthContext from '../contexts/AuthContext'
 
 export default function RegisterScreen({ navigation }) {
+  
+  const { setUser } = useContext(AuthContext)
+
   useEffect(() => {
     navigation.setOptions({
       headerShown: false,
     });
   }, []);
 
-  const handleLogin = () => {
-    navigation.navigate('Home');
+  const [client, setClient] = useState({
+    name:'',
+    email:'',
+    password:'',
+    password_confirmation:''
+  });
+
+  const [errors, setErrors] = useState({});
+
+  const handelChange = (name, value) => setClient({...client, [name]:value})
+
+  const handelRegister = async () => {
+    try {
+      await register(client);
+      const user = loaduser();
+      console.log(user)
+      setUser(user);
+    } catch (error) {
+      if (error.response?.data) {
+        setErrors(error.response.data.errors)
+      }
+    }
   };
 
   return (
@@ -20,24 +45,32 @@ export default function RegisterScreen({ navigation }) {
         <FormTextField
           placeholder='Nombre'
           placeholderTextColor="#aaa" 
+          onChangeText={(text)=>handelChange('name',text)}
+          errors={errors.name}
         />
         
         <FormTextField
           placeholder='Correo' 
           placeholderTextColor="#aaa" 
+          onChangeText={(text)=>handelChange('email',text)}
+          errors={errors.email}
         />
         <FormTextField
           placeholder='Contraseña' 
-          placeholderTextColor="#aaa" 
+          placeholderTextColor="#aaa"
+          onChangeText={(text)=>handelChange('password',text)} 
+          errors={errors.password}
           secureTextEntry 
         />
         <FormTextField
           placeholder='Confirmar contraseña'
           placeholderTextColor="#aaa" 
+          onChangeText={(text)=>handelChange('password_confirmation',text)} 
+          errors={errors.password}
           secureTextEntry 
         />
       </View>
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
+      <TouchableOpacity style={styles.button} onPress={handelRegister}>
         <Text style={styles.buttonText}>Register</Text>
       </TouchableOpacity>
 

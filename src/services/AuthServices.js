@@ -12,7 +12,7 @@ export const register = async (request) => {
 }
 
 export const loaduser = async () => {
-    let {user} = api.post('/auth/user');
+    let {user} = await api.get('/auth/user');
     return user
 }
 

@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store'
 
-let toten;
+let token;
 
 export const setToken = async (newToken) =>{
     token = newToken;
