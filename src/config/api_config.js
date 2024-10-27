@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { getToken } from '../services/TokenServices'
 
-const API_URL = 'https://d7a1-2806-105e-21-c47a-98a-3a37-dc92-892.ngrok-free.app';
+const API_URL = process.env.EXPO_PUBLIC_API_URL;
 
 export const api = axios.create({
     baseURL:API_URL+'/api',

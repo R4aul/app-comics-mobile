@@ -1,8 +1,8 @@
 import { api } from '../config/api_config'
 
 export const getComics = async (comic = null) => {
-    if (comic != null) {
-       let comics = await api.get('/comics/getAllComics/'+comic)
+    if (comic) {
+       let comics = await api.get(`/comics/getAllComics?search=${encodeURIComponent(comic)}`)
        return comics; 
     }
     let comics = await api.get('/comics/getAllComics');

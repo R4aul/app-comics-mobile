@@ -10,6 +10,7 @@ import HistoryScreen from './src/screens/Tabs/HistoryScreen';
 import NotificationsScreen from './src/screens/NotificationsScreen';
 import AuthContext from './src/contexts/AuthContext';
 import ComicScreen from './src/screens/Tabs/comics/ComicScreen';
+import CategoriesComics from './src/screens/drawer/CategoriesComics'
 import { loaduser } from './src/services/AuthServices';
 
 // Crear el Tab Navigator
@@ -18,7 +19,7 @@ const Tab = createBottomTabNavigator();
 function HomeScreens() {
   return (
     <Tab.Navigator initialRouteName='ForMeScreen'>
-      <Tab.Screen name="ForMeScreen" component={ForMeScreen} options={{ title: 'Para mi' }} />
+      <Tab.Screen name="ForMeScreen" component={ForMeScreen} options={{ title: 'Para mi'}} />
       <Tab.Screen name="HistoryScreen" component={HistoryScreen} options={{ title: 'Historial' }} />
     </Tab.Navigator>
   );
@@ -81,6 +82,7 @@ function DrawerNavigator() {
           }}/>
           <Drawer.Screen name="Notifications" component={NotificationsScreen} />
           {/* No agregamos ComicScreen aquí */}
+          <Drawer.Screen name='CategoriesComics' component={CategoriesComics}/>
         </>
       ) : (
         <>

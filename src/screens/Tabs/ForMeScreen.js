@@ -1,15 +1,16 @@
 import { useEffect, useContext, useState } from 'react'
-import { Text, View, FlatList, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { Text, View, FlatList, StyleSheet, TouchableOpacity} from 'react-native';
 import AuthContext from '../../contexts/AuthContext'
 import { logout } from '../../services/AuthServices'
 import { getComics } from '../../services/ComicServices'
 import FormTextField from '../../components/FormTextField'
+import ComicsList from '../../components/ComicsList'
 
 export default function ForMeScreen({ navigation }){
   const {user, setUser} = useContext(AuthContext) 
-  const [comics, setComics] = useState(); 
-  const [search = setSearch] = useState('')
-
+  const [comics, setComics] = useState([]); 
+  const [filterComics, setFilterComics] = useState([])
+  
   const handelLogoOut = async () => {
     try {
       await logout()
@@ -31,32 +32,35 @@ export default function ForMeScreen({ navigation }){
     async function runEffect() {
       let {data} = await getComics();
       setComics(data);
+      setFilterComics(data)
     }
     runEffect();
   },[]);
 
-  const renderRecommendation = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.card} 
-      onPress={() => navigation.navigate('ComicScreen', {id:item.id})} // Accion al tocar la card
-    >
-      <Image source={{ uri: item.image }} style={styles.image} />
-      <View style={styles.info}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.author.name}</Text>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderRecommendation = ({ item }) => <ComicsList item={item}/>;
 
+  const searchFilterComics = (text) => {
+    if (text) {
+      const newComic = comics.filter(item=>{
+        const itemComic = item.title ? item.title.toUpperCase() : ''.toUpperCase();
+        const textComic = text.toUpperCase();
+        return itemComic.indexOf(textComic) > -1;
+      });
+      setFilterComics(newComic)
+    } else {
+      setFilterComics(comics)
+    }
+  }
 
   return (
     <View style={styles.container}>
       <FormTextField
-        placeholder="Buscar comic..."
-        onChangeText={setComics}
+        placeholder='Buscar Comic...'
+        placeholderTextColor='#aaa'
+        onChangeText={searchFilterComics}
       />
       <FlatList
-        data={comics}
+        data={filterComics}
         renderItem={renderRecommendation}
         keyExtractor={item => item.id}
       />
@@ -82,33 +86,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 10,
   },
-  card: {
-    flexDirection: 'row',
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#f8f8f8',
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 1,
-  },
-  image: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-  },
-  info: {
-    marginLeft: 10,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  description: {
-    fontSize: 14,
-    color: '#666',
-  },
-  
 });
