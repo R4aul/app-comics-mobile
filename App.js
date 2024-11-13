@@ -11,6 +11,9 @@ import NotificationsScreen from './src/screens/NotificationsScreen';
 import AuthContext from './src/contexts/AuthContext';
 import ComicScreen from './src/screens/Tabs/comics/ComicScreen';
 import CategoriesComics from './src/screens/drawer/CategoriesComics'
+import ComicsForCategories from './src/screens/stacks/ComicsForCategories'
+import MyFavoritesScreen from './src/screens/drawer/MyFavoritesScreen'
+import MyBookingsScreen from './src/screens/drawer/MyBookingsScreen'
 import { loaduser } from './src/services/AuthServices';
 
 // Crear el Tab Navigator
@@ -63,6 +66,13 @@ export default function App() {
             name="ComicScreen" 
             component={ComicScreen} 
           />
+          <Stack.Screen 
+            name='ComicsForCategories'
+            component={ComicsForCategories}
+            options={{
+              title:'Comics por categoria'
+            }}
+          />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthContext.Provider>
@@ -82,7 +92,15 @@ function DrawerNavigator() {
           }}/>
           <Drawer.Screen name="Notifications" component={NotificationsScreen} />
           {/* No agregamos ComicScreen aquí */}
-          <Drawer.Screen name='CategoriesComics' component={CategoriesComics}/>
+          <Drawer.Screen name='CategoriesComics' component={CategoriesComics} options={{
+            title:'Categorias'
+          }}/>
+          <Drawer.Screen name='MyFavoritesScreen' component={MyFavoritesScreen} options={{
+            title:'Mis Favoritos'
+          }} />
+          <Drawer.Screen name='MyBookinsScreen' component={MyBookingsScreen} options={{
+            title:'Mis Recervas'
+          }} />
         </>
       ) : (
         <>

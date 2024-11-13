@@ -20,6 +20,11 @@ export const bookingComic = async (data) => {
 }
 
 export const getAllCategories = async () => {
-    let categories = await api.get('/comics/getAllComics');
+    let categories = await api.get('/comics/getAllCategories');
     return categories;
+}
+
+export const getComicsForCategory = async (id) => {
+    let comics = await api.get('/comics/getComicsForCategory/'+id);
+    return comics;
 }
