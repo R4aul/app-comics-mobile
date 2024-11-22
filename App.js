@@ -1,42 +1,159 @@
 import * as React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { createStackNavigator } from '@react-navigation/stack';  // Stack Navigator
+import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationContainer } from '@react-navigation/native';
+import { TouchableOpacity, Alert } from 'react-native';
+import Ionicons from '@expo/vector-icons/Ionicons';
+
 import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import ForMeScreen from './src/screens/Tabs/ForMeScreen';
 import HistoryScreen from './src/screens/Tabs/HistoryScreen';
-import NotificationsScreen from './src/screens/NotificationsScreen';
-import AuthContext from './src/contexts/AuthContext';
+import NotificarionsScreen from './src/screens/Tabs/NotificarionsScreen';
 import ComicScreen from './src/screens/Tabs/comics/ComicScreen';
-import CategoriesComics from './src/screens/drawer/CategoriesComics'
-import ComicsForCategories from './src/screens/stacks/ComicsForCategories'
-import MyFavoritesScreen from './src/screens/drawer/MyFavoritesScreen'
-import MyBookingsScreen from './src/screens/drawer/MyBookingsScreen'
-import { loaduser } from './src/services/AuthServices';
+import CategoriesComics from './src/screens/drawer/CategoriesComics';
+import ComicsForCategories from './src/screens/stacks/ComicsForCategories';
+import MyFavoritesScreen from './src/screens/drawer/MyFavoritesScreen';
+import MyBookingsScreen from './src/screens/drawer/MyBookingsScreen';
+import MyComicsFavoritesScreen from './src/screens/drawer/MyComicsFavoritesScreen';
 
-// Crear el Tab Navigator
+import AuthContext from './src/contexts/AuthContext';
+import { loaduser, logout } from './src/services/AuthServices';
+
 const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
+const Stack = createStackNavigator();
 
 function HomeScreens() {
   return (
-    <Tab.Navigator initialRouteName='ForMeScreen'>
-      <Tab.Screen name="ForMeScreen" component={ForMeScreen} options={{ title: 'Para mi'}} />
-      <Tab.Screen name="HistoryScreen" component={HistoryScreen} options={{ title: 'Historial' }} />
+    <Tab.Navigator
+      initialRouteName="ForMeScreen"
+      screenOptions={{
+        tabBarActiveTintColor: 'tomato',
+        tabBarInactiveTintColor: 'gray',
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen
+        name="ForMeScreen"
+        component={ForMeScreen}
+        options={{
+          title: 'Para mí',
+          tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="HistoryScreen"
+        component={HistoryScreen}
+        options={{
+          title: 'Historial',
+          tabBarIcon: ({ color, size }) => <Ionicons name="time" size={size} color={color} />,
+        }}
+      />
+      <Tab.Screen
+        name="NotificationScreen"
+        component={NotificarionsScreen}
+        options={{
+          title: 'Notificaciones',
+          tabBarIcon: ({ color, size }) => <Ionicons name="notifications" size={size} color={color} />,
+        }}
+      />
     </Tab.Navigator>
   );
 }
 
-// Crear el Drawer Navigator
-const Drawer = createDrawerNavigator();
+function DrawerNavigator() {
+  const { user, setUser } = React.useContext(AuthContext);
 
-// Crear el Stack Navigator
-const Stack = createStackNavigator();  // Stack para ComicScreen y el Drawer
+  const handleLogout = () => {
+    Alert.alert('Cerrar sesión', '¿Estás seguro de que deseas cerrar sesión?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Cerrar sesión', onPress: async () => {
+        setUser(null)
+        await logout();
+      } },
+    ]);
+  };
+
+  return (
+    <Drawer.Navigator>
+      {user ? (
+        <>
+          <Drawer.Screen
+            name="Home"
+            component={HomeScreens}
+            options={{
+              title: 'Inicio',
+              headerRight: () => (
+                <TouchableOpacity onPress={handleLogout} style={{ marginRight: 15 }}>
+                  <Ionicons name="log-out-outline" size={24} color="black" />
+                </TouchableOpacity>
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="CategoriesComics"
+            component={CategoriesComics}
+            options={{
+              title: 'Categorías',
+              headerRight: () => (
+                <TouchableOpacity onPress={handleLogout} style={{ marginRight: 15 }}>
+                  <Ionicons name="log-out-outline" size={24} color="black" />
+                </TouchableOpacity>
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="MyFavoritesScreen"
+            component={MyFavoritesScreen}
+            options={{
+              title: 'Mis Preferencias',
+              headerRight: () => (
+                <TouchableOpacity onPress={handleLogout} style={{ marginRight: 15 }}>
+                  <Ionicons name="log-out-outline" size={24} color="black" />
+                </TouchableOpacity>
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="MyBookingsScreen"
+            component={MyBookingsScreen}
+            options={{
+              title: 'Mis Reservas',
+              headerRight: () => (
+                <TouchableOpacity onPress={handleLogout} style={{ marginRight: 15 }}>
+                  <Ionicons name="log-out-outline" size={24} color="black" />
+                </TouchableOpacity>
+              ),
+            }}
+          />
+          <Drawer.Screen
+            name="MyComicsFavoritesScreen"
+            component={MyComicsFavoritesScreen}
+            options={{
+              title: 'Mis cómics favoritos',
+              headerRight: () => (
+                <TouchableOpacity onPress={handleLogout} style={{ marginRight: 15 }}>
+                  <Ionicons name="log-out-outline" size={24} color="black" />
+                </TouchableOpacity>
+              ),
+            }}
+          />
+        </>
+      ) : (
+        <>
+          <Drawer.Screen name="LoginScreen" component={LoginScreen} options={{ swipeEnabled: false }} />
+          <Drawer.Screen name="RegisterScreen" component={RegisterScreen} options={{ swipeEnabled: false }} />
+        </>
+      )}
+    </Drawer.Navigator>
+  );
+}
 
 export default function App() {
   const [user, setUser] = React.useState();
-  
+
   React.useEffect(() => {
     async function runEffect() {
       try {
@@ -53,61 +170,18 @@ export default function App() {
   return (
     <AuthContext.Provider value={{ user, setUser }}>
       <NavigationContainer>
-        {/* Stack Navigator que maneja el Drawer y ComicScreen */}
         <Stack.Navigator>
-          {/* Drawer Navigator envuelto en una pantalla de Stack */}
-          <Stack.Screen 
-            name="Drawer" 
-            component={DrawerNavigator} 
-            options={{ headerShown: false }} 
-          />
-          {/* ComicScreen está en el Stack pero fuera del Drawer */}
-          <Stack.Screen 
-            name="ComicScreen" 
-            component={ComicScreen} 
-          />
-          <Stack.Screen 
-            name='ComicsForCategories'
+          <Stack.Screen name="Drawer" component={DrawerNavigator} options={{ headerShown: false }} />
+          <Stack.Screen name="ComicScreen" component={ComicScreen} />
+          <Stack.Screen
+            name="ComicsForCategories"
             component={ComicsForCategories}
             options={{
-              title:'Comics por categoria'
+              title: 'Cómics por categoría',
             }}
           />
         </Stack.Navigator>
       </NavigationContainer>
     </AuthContext.Provider>
-  );
-}
-
-// Drawer Navigator que solo contiene las pantallas del Drawer
-function DrawerNavigator() {
-  const { user } = React.useContext(AuthContext);
-
-  return (
-    <Drawer.Navigator>
-      {user ? (
-        <>
-          <Drawer.Screen name="Home" component={HomeScreens} options={{
-            title:'Inicio'
-          }}/>
-          <Drawer.Screen name="Notifications" component={NotificationsScreen} />
-          {/* No agregamos ComicScreen aquí */}
-          <Drawer.Screen name='CategoriesComics' component={CategoriesComics} options={{
-            title:'Categorias'
-          }}/>
-          <Drawer.Screen name='MyFavoritesScreen' component={MyFavoritesScreen} options={{
-            title:'Mis Favoritos'
-          }} />
-          <Drawer.Screen name='MyBookinsScreen' component={MyBookingsScreen} options={{
-            title:'Mis Recervas'
-          }} />
-        </>
-      ) : (
-        <>
-          <Drawer.Screen name="LoginScreen" component={LoginScreen} options={{ swipeEnabled: false }} />
-          <Drawer.Screen name="RegisterScreen" component={RegisterScreen} options={{ swipeEnabled: false }} />
-        </>
-      )}
-    </Drawer.Navigator>
   );
 }

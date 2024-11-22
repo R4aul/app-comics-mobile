@@ -8,15 +8,27 @@ const RecommendationCard = ({ item }) => {
   return (
     <TouchableOpacity
       style={styles.card}
-      onPress={() => navigation.navigate('ComicScreen', { id: item.id })} // Acción al tocar la card
+      onPress={() => navigation.navigate('ComicScreen', { id: item.id })}
     >
       <Image
-        source={{ uri: 'https://media.gettyimages.com/id/1252349524/es/vector/efectos-de-dibujos-animados.jpg?s=612x612&w=gi&k=20&c=YSsVv3x2r4xPS8jVR4RMuuwHUnuszQYLIGLzVm0-GBs=' }}
+        source={{
+          uri: 'https://media.gettyimages.com/id/1252349524/es/vector/efectos-de-dibujos-animados.jpg?s=612x612&w=gi&k=20&c=YSsVv3x2r4xPS8jVR4RMuuwHUnuszQYLIGLzVm0-GBs=',
+        }}
         style={styles.image}
       />
       <View style={styles.info}>
         <Text style={styles.title}>{item.title}</Text>
         <Text style={styles.description}>{item.author.name}</Text>
+        {item.pivot ? (
+          <>
+            <Text style={styles.bookingDate}>
+              Día de la reserva: {item.pivot.booking_date}
+            </Text>
+            <Text style={styles.finalDate}>
+              Día de la entrega: {item.pivot.final_date}
+            </Text>
+          </>
+        ) : null}
       </View>
     </TouchableOpacity>
   );
@@ -50,6 +62,17 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 14,
     color: '#666',
+    marginBottom: 5,
+  },
+  bookingDate: {
+    fontSize: 14,
+    color: '#4CAF50', // Verde para destacar las reservas
+    fontWeight: 'bold',
+  },
+  finalDate: {
+    fontSize: 14,
+    color: '#FF5722', // Naranja para las entregas
+    fontWeight: 'bold',
   },
 });
 

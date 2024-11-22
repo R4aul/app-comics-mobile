@@ -1,9 +1,24 @@
-import { View, Text, ActivityIndicator, StyleSheet, Image, FlatList, Button, KeyboardAvoidingView, Platform, TouchableOpacity } from 'react-native';
-import { useEffect, useState } from 'react';
-import { getComic } from '../../../services/ComicServices';
-import { createReview } from '../../../services/ReviewServices';
-import FormTextField from '../../../components/FormTextField';
-import CardReview from '../../../components/CardReview'
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  ActivityIndicator,
+  StyleSheet,
+  Image,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableOpacity,
+} from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons'; // Importación de los íconos
+import { getComic } from '../../../services/ComicServices'; // Servicio para obtener detalles del cómic
+import { createReview } from '../../../services/ReviewServices'; // Servicio para crear reseñas
+import { logout } from '../../../services/AuthServices'; // Servicio para cerrar sesión
+import FormTextField from '../../../components/FormTextField'; // Componente personalizado para campos de texto
+import CardReview from '../../../components/CardReview'; // Componente para renderizar reseñas
+import { checkBookingStatus, checkComicFavoriteStatus } from '../../../services/UserServices'
+import { storeOrChoiseComicFavorite } from '../../../services/FavoriteService'
+import { store } from '../../../services/BookingService'
 
 export default function ComicScreen({ navigation, route }) {
   const { id } = route.params || {};
@@ -13,6 +28,8 @@ export default function ComicScreen({ navigation, route }) {
   const [errors, setErrors] = useState({});
   const [rating, setRating] = useState('');
   const [reviewText, setReviewText] = useState('');
+  const [isBooking, setIsBooking] = useState(false)
+  const [isComicFavorite, setIsComicFavorite] = useState(false)
 
   const handelLogoOut = async () => {
     try {
@@ -39,6 +56,51 @@ export default function ComicScreen({ navigation, route }) {
       setLoading(false);
     }
   };
+
+  const fetchCheckBookingStatus = async () =>{
+    try {
+      const {data} = await checkBookingStatus(id); 
+      setIsBooking(data.isBooking);
+    } catch (error) {
+      console.log("Error al verificar el estado de reserva")
+    }
+  }
+
+  const fetchCheckComicFavoriteStatus = async () =>{
+    try {
+      const { data } = await checkComicFavoriteStatus(id);
+      console.log(data);
+      setIsComicFavorite(data.isComicFavorite)
+    } catch (error) {
+      console.log("Error al verificar el stadi de comic favorito") 
+    }
+  }
+
+  const toggleBooking = async () => {
+    try {
+      let request = {
+        comic_id:id,
+      };
+      const { data } = await store(request);
+      console.log(data)
+      setIsBooking(!isBooking);
+    } catch (error) {
+      console.log(error); 
+    }
+  }
+  const toggleComicFavorite = async () => {
+    try {
+      let request = {
+        comic_id: id
+      }
+      const { data } = await storeOrChoiseComicFavorite(request)
+      console.log(data);
+      setIsComicFavorite(!isComicFavorite);
+    } catch (error) {
+      console.log("Error al guardar en favoritos")
+    }
+  }
+
 
   const handleSubmitReview = async () => {
     try {
@@ -68,6 +130,8 @@ export default function ComicScreen({ navigation, route }) {
       ),
     });
     fetchGetComic();
+    fetchCheckBookingStatus();
+    fetchCheckComicFavoriteStatus();
   }, []);
 
   if (loading) {
@@ -87,7 +151,7 @@ export default function ComicScreen({ navigation, route }) {
     );
   }
 
-  const cardReview = ({item}) => <CardReview item={item}/>
+  const cardReview = ({ item }) => <CardReview item={item} />;
 
   return (
     <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
@@ -101,6 +165,19 @@ export default function ComicScreen({ navigation, route }) {
             <Text style={styles.title}>{item.title}</Text>
             <Text style={styles.author}>Author: {item.author.name}</Text>
             <Text style={styles.category}>Categoria: {item.category.name}</Text>
+
+            {/* Botones con íconos */}
+            <View style={styles.iconButtonsContainer}>
+              <TouchableOpacity style={styles.iconButton} onPress={toggleBooking}>
+                <Icon name={isBooking ? "book-sharp" : "book-outline"} size={24} color="#4CAF50" />
+                <Text style={styles.iconButtonText}>Reservar</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity style={styles.iconButton} onPress={toggleComicFavorite}>
+                <Icon name={isComicFavorite ? "heart-sharp" :"heart-outline"} size={24} color="#FF6347" />
+                <Text style={styles.iconButtonText}>Favorito</Text>
+              </TouchableOpacity>
+            </View>
 
             <View style={styles.formContainer}>
               <Text style={styles.sectionTitle}>Escribe una reseña</Text>
@@ -120,7 +197,9 @@ export default function ComicScreen({ navigation, route }) {
                 multiline
                 errors={errors.review_text}
               />
-              <Button title="Enviar Review" onPress={handleSubmitReview} />
+              <TouchableOpacity style={styles.submitButton} onPress={handleSubmitReview}>
+                <Text style={styles.submitButtonText}>Enviar Review</Text>
+              </TouchableOpacity>
             </View>
 
             <Text style={styles.sectionTitle}>Reseñas:</Text>
@@ -178,5 +257,31 @@ const styles = StyleSheet.create({
   },
   formContainer: {
     marginTop: 20,
+  },
+  iconButtonsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  iconButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  iconButtonText: {
+    marginTop: 5,
+    fontSize: 14,
+    color: '#333',
+  },
+  submitButton: {
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    borderRadius: 5,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  submitButtonText: {
+    color: '#FFF',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

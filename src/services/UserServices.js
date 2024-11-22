@@ -20,3 +20,13 @@ export const getAllFavorites = async () => {
     let response = await api.get('users/getAllFavorites');
     return response;
 }
+
+export const checkBookingStatus = async (id) => {
+    let response = await api.get(`users/${id}/checkBookingStatus`);
+    return response;
+}
+
+export const checkComicFavoriteStatus = async (id) => {
+    let response = await api.get(`users/${id}/checkComicFavoriteStatus`);
+    return response;
+}
